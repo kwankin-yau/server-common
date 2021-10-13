@@ -1,17 +1,40 @@
 package com.lucendar.common.serv.cleanup;
 
-public class QuotaConfig {
+public class QuotaCleanupConfig implements CleanupConfig {
+
     private boolean enabled;
+    private String cron;
     private long quotaInM;
     private long deleteInM;
     private Long avgItemSize;
 
+    public QuotaCleanupConfig() {
+    }
+
+    public QuotaCleanupConfig(boolean enabled, String cron, long quotaInM, long deleteInM, Long avgItemSize) {
+        this.enabled = enabled;
+        this.cron = cron;
+        this.quotaInM = quotaInM;
+        this.deleteInM = deleteInM;
+        this.avgItemSize = avgItemSize;
+    }
+
+    @Override
     public boolean isEnabled() {
         return enabled;
     }
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    @Override
+    public String getCron() {
+        return cron;
+    }
+
+    public void setCron(String cron) {
+        this.cron = cron;
     }
 
     public long getQuotaInM() {
@@ -53,10 +76,12 @@ public class QuotaConfig {
 
     @Override
     public String toString() {
-        return "QuotaConfig{" +
+        return "QuotaCleanupConfig{" +
                 "enabled=" + enabled +
+                ", cron='" + cron + '\'' +
                 ", quotaInM=" + quotaInM +
                 ", deleteInM=" + deleteInM +
+                ", avgItemSize=" + avgItemSize +
                 '}';
     }
 }

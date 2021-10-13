@@ -6,7 +6,7 @@ plugins {
 }
 
 group 'com.lucendar.common'
-version '1.0.0'
+version '1.0.1'
 
 compileJava.options.encoding = 'UTF-8'
 compileScala.options.encoding = 'UTF-8'
@@ -22,6 +22,9 @@ dependencies {
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
 
     api 'org.scala-lang:scala-library:2.13.6'
+    implementation('com.typesafe.scala-logging:scala-logging_2.13:3.9.2')
+    api 'javax.servlet:javax.servlet-api:4.0.1'
+    api 'org.springframework:spring-web:5.2.+'
 
 }
 

@@ -1,20 +1,29 @@
 package com.lucendar.common.serv.cleanup
 
 
-
 import com.lucendar.common.serv.cleanup.CleanupByQuota.CleanupByQuotaResult
+import com.typesafe.scalalogging.Logger
 
 import java.util
+import java.util.concurrent.atomic.AtomicLong
+import scala.reflect.ClassTag
 
 
 trait CleanupByQuota[ITEM] {
 
-  val config: QuotaConfig
+  def logger: Logger
+
+  val config: QuotaCleanupConfig
 
   /**
    * The delete target average file size in bytes. Used to estimate item record should be delete.
    */
   val avgTargetItemSize: Long
+
+  def cachedTotalDiskUsage: AtomicLong
+
+  protected var totalDiskUsageLoaded: Boolean = false
+  protected var executeTimes: Long = 0
 
   /**
    * Get file size of the target item.
@@ -25,12 +34,19 @@ trait CleanupByQuota[ITEM] {
   def fileSizeOfItem(item: ITEM): Long
 
   /**
-   * Query earliest target items in processing table.
+   * Query earliest target items in target table.
    *
    * @param limit the count of earliest target
    * @return earliest target items in processing table.
    */
   def qryEarliestItems(limit: Int): java.util.List[ITEM]
+
+  /**
+   * Delete earliest n target items in target table.
+   *
+   * @param n the count of earliest target
+   */
+  def deleteEarliestItems(n: Int): Unit
 
   /**
    * Delete a batch records.
@@ -40,7 +56,8 @@ trait CleanupByQuota[ITEM] {
    * @param filesNeedToDelete files need to delete, used to return deleted items.
    * @return delete result.
    */
-  def deleteBatch(sizeToDelete: Long, itemCount: Int, filesNeedToDelete: java.util.List[ITEM]): CleanupByQuotaResult = {
+  def deleteBatch(sizeToDelete: Long, itemCount: Int, filesNeedToDelete: java.util.List[ITEM])(implicit classTag: ClassTag[ITEM]): CleanupByQuotaResult = {
+    logger.debug(s"deleteBatch(${classTag.runtimeClass.getSimpleName}): sizeToDelete=$sizeToDelete, itemCount=$itemCount")
     val items = qryEarliestItems(itemCount)
     var deletedSize: Long = 0
     var isAllDeleted: Boolean = false
@@ -48,6 +65,9 @@ trait CleanupByQuota[ITEM] {
 
     if (!items.isEmpty) {
       isAllDeleted = items.size() < itemCount
+
+      deleteEarliestItems(items.size())
+      logger.debug(s"delete ${items.size()} earliest items.")
 
       import scala.util.control.Breaks._
       breakable {
@@ -66,6 +86,7 @@ trait CleanupByQuota[ITEM] {
       }
     }
 
+    logger.debug(s"deleteBatch(${classTag.runtimeClass.getSimpleName}): deletedSize=$deletedSize, isAllDeleted=$isAllDeleted")
     CleanupByQuotaResult(deletedSize, isAllDeleted)
   }
 
@@ -76,22 +97,35 @@ trait CleanupByQuota[ITEM] {
    */
   def qryTotalSize(): Long
 
-  /**
-   * Update the total size of files used in all items in table. Called when files corresponding to items deleted.
-   *
-   * @param deletedSize size of deleted files.
-   * @return new total size of files used in all items in table.
-   */
-  def updateTotalSize(deletedSize: Long): Long
+  protected def updateCachedTotalDiskUsage(): Unit = {
+    val total = qryTotalSize()
+    logger.debug("qryTotalSize returns " + total)
+    cachedTotalDiskUsage.set(total)
+    totalDiskUsageLoaded = true
+  }
 
   /**
    * Execute quota based deletion.
    *
    * @return files need to delete.
    */
-  def execute(): java.util.List[ITEM] = {
+  def execute()(implicit classTag: ClassTag[ITEM]): java.util.List[ITEM] = {
+    logger.debug("Starting cleanup by quota: " + classTag.runtimeClass.getSimpleName + ", using config: " + config + ".")
+
+    var loadTotal = !totalDiskUsageLoaded
+    if (!loadTotal) {
+      if ((executeTimes & 7) == 7)
+        loadTotal = true
+    }
+
+    if (loadTotal)
+      updateCachedTotalDiskUsage()
+
     val r = new util.ArrayList[ITEM]()
     val totalSize = qryTotalSize()
+    logger.debug(s"qryTotalSize(${classTag.runtimeClass.getSimpleName}) returned " + totalSize)
+    var reQuery = false
+
     if (totalSize > config.quota()) {
       var sizeToDelete = config.deleteBatchSize()
       var isAllDeleted = false
@@ -102,12 +136,21 @@ trait CleanupByQuota[ITEM] {
           itemCount += 1
 
         val result = deleteBatch(sizeToDelete, itemCount.toInt, r)
-        updateTotalSize(result.deletedSize)
+        val newTotal = cachedTotalDiskUsage.addAndGet(-result.deletedSize)
+        logger.debug(s"UpdateTotalSize(-${result.deletedSize}) returned new total is: " + newTotal)
+        if (newTotal < 0)
+          reQuery = true
 
         sizeToDelete -= result.deletedSize
         isAllDeleted = result.isAllDeleted
       }
     }
+
+    executeTimes += 1
+    if (reQuery)
+      updateCachedTotalDiskUsage()
+
+    logger.debug("Cleanup by quota: " + classTag.runtimeClass.getSimpleName + ", delete " + r.size() + " records.")
 
     r
   }
