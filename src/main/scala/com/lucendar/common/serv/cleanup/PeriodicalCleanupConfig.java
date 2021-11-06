@@ -7,14 +7,20 @@
  *******************************************************************************/
 package com.lucendar.common.serv.cleanup;
 
+import info.gratour.common.types.validate.ValidateResultReceiver;
+import org.springframework.scheduling.support.CronExpression;
+
+import java.util.function.Consumer;
+
 public class PeriodicalCleanupConfig implements CleanupConfig {
 
-    public static int KEEP_ONE_MONTH = 31;
+    public static int KEEP_ONE_MONTH = 32;
     public static int KEEP_HALF_YEAR = 183;
 
     private boolean enabled;
     private String cron;
-    private long keepDataDurationMinutes;
+    private int keepDays;
+    private long keepMinutes = 2880; // only for debug
 
     public PeriodicalCleanupConfig() {
     }
@@ -22,7 +28,7 @@ public class PeriodicalCleanupConfig implements CleanupConfig {
     public PeriodicalCleanupConfig(boolean enabled, String cron, long keepDataDurationMinutes) {
         this.enabled = enabled;
         this.cron = cron;
-        this.keepDataDurationMinutes = keepDataDurationMinutes;
+        this.keepMinutes = keepDataDurationMinutes;
     }
 
     @Override
@@ -43,12 +49,33 @@ public class PeriodicalCleanupConfig implements CleanupConfig {
         this.cron = cron;
     }
 
-    public long getKeepDataDurationMinutes() {
-        return keepDataDurationMinutes;
+    public int getKeepDays() {
+        return keepDays;
     }
 
-    public void setKeepDataDurationMinutes(long keepDataDurationMinutes) {
-        this.keepDataDurationMinutes = keepDataDurationMinutes;
+    public void setKeepDays(int keepDays) {
+        this.keepDays = keepDays;
+    }
+
+    public long getKeepMinutes() {
+        return keepMinutes;
+    }
+
+    public void setKeepMinutes(long keepMinutes) {
+        this.keepMinutes = keepMinutes;
+    }
+
+    public void validate(ValidateResultReceiver receiver) {
+        if (enabled) {
+            if (cron == null || cron.isEmpty() || !CronExpression.isValidExpression(cron))
+                receiver.invalidField("cron");
+
+            if (keepDays < 0)
+                receiver.invalidField("keepDays");
+
+            if (keepDays == 0 && keepMinutes < 0)
+                receiver.invalidField("keepDays");
+        }
     }
 
     @Override
@@ -56,7 +83,8 @@ public class PeriodicalCleanupConfig implements CleanupConfig {
         return "PeriodicalCleanupConfig{" +
                 "enabled=" + enabled +
                 ", cron='" + cron + '\'' +
-                ", keepDataDurationMinutes=" + keepDataDurationMinutes +
+                ", keepDays=" + keepDays +
+                ", keepMinutes=" + keepMinutes +
                 '}';
     }
 }

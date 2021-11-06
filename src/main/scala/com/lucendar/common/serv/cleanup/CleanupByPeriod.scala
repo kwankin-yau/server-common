@@ -4,12 +4,12 @@ package com.lucendar.common.serv.cleanup
 import com.typesafe.scalalogging.Logger
 
 import java.time.OffsetDateTime
-import java.util.concurrent.TimeUnit
 import scala.reflect.ClassTag
 
 trait CleanupByPeriod[ITEM] {
 
   def logger: Logger
+  def name: String
 
   val config: PeriodicalCleanupConfig
 
@@ -29,11 +29,17 @@ trait CleanupByPeriod[ITEM] {
   def deleteItems(timeBefore: Long): Unit
 
   def execute()(implicit classTag: ClassTag[ITEM]): java.util.List[ITEM] = {
-    logger.debug("Starting execute cleanup by time: " + classTag.runtimeClass.getSimpleName)
-    var time = OffsetDateTime.now()
-    time = time.minusMinutes(config.getKeepDataDurationMinutes)
+    logger.debug(s"[$name] Starting execute cleanup by time: " + classTag.runtimeClass.getSimpleName)
 
-    logger.debug("Delete records before time: " + time)
+    var time = OffsetDateTime.now()
+
+    if (config.getKeepDays > 0) {
+      time = time.minusDays(config.getKeepDays)
+      logger.debug(s"[${name}] Delete records before time: " + time + s", keep data in days: ${config.getKeepDays}")
+    } else {
+      time = time.minusMinutes(config.getKeepMinutes)
+      logger.debug(s"[${name}] Delete records before time: " + time + s", keep data in minutes: ${config.getKeepMinutes}")
+    }
 
     val timeBefore = time.toInstant.toEpochMilli
 

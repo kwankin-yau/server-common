@@ -7,7 +7,8 @@
  * ***************************************************************************** */
 package com.lucendar.common.serv.servlet
 
-import org.springframework.http.HttpHeaders
+import org.springframework.http.{HttpHeaders, HttpMethod}
+import org.springframework.web.servlet.config.annotation.CorsRegistry
 
 import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 
@@ -15,6 +16,8 @@ import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
  * @since 1.0.1
  */
 object ServletHelper {
+
+  val HEADER_X_AUTH_TOKEN = "X-Auth-Token"
 
   def addCorsHeaders(request: HttpServletRequest, response: HttpServletResponse): Unit = {
     val origin = request.getHeader(HttpHeaders.ORIGIN)
@@ -43,6 +46,65 @@ object ServletHelper {
 
     if (!response.containsHeader(HttpHeaders.ACCESS_CONTROL_MAX_AGE))
       response.setHeader("Access-Control-Max-Age", "3600")
+  }
+
+  def addCorsMappings(registry: CorsRegistry): Unit = {
+    registry.addMapping("/**")
+      .allowedOrigins("*")
+      .allowedMethods(
+        HttpMethod.GET.name(),
+        HttpMethod.PUT.name(),
+        HttpMethod.POST.name(),
+        HttpMethod.DELETE.name(),
+        HttpMethod.OPTIONS.name()
+      )
+      .allowedHeaders(
+        HEADER_X_AUTH_TOKEN,
+        HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN,
+        HttpHeaders.CONTENT_TYPE,
+        HttpHeaders.DATE,
+        HttpHeaders.AUTHORIZATION
+      )
+  }
+
+  /*
+  private static final String[] HEADERS_TO_TRY = {
+            "X-Forwarded-For",
+            "Proxy-Client-IP",
+            "WL-Proxy-Client-IP",
+            "HTTP_X_FORWARDED_FOR",
+            "HTTP_X_FORWARDED",
+            "HTTP_X_CLUSTER_CLIENT_IP",
+            "HTTP_CLIENT_IP",
+            "HTTP_FORWARDED_FOR",
+            "HTTP_FORWARDED",
+            "HTTP_VIA",
+            "REMOTE_ADDR" };
+
+private String getClientIpAddress(HttpServletRequest request) {
+    for (String header : HEADERS_TO_TRY) {
+        String ip = request.getHeader(header);
+        if (ip != null && ip.length() != 0 && !"unknown".equalsIgnoreCase(ip)) {
+            return ip;
+        }
+    }
+
+    return request.getRemoteAddr();}
+   */
+
+  def getClientIp(req: HttpServletRequest): String = {
+    if (req != null) {
+      val addr = req.getHeader("X-Forwarded-For")
+      if (addr == null || addr.isEmpty)
+        req.getRemoteAddr
+      else {
+        if (addr.contains(","))
+          addr.split(",")(0).trim
+        else
+          addr
+      }
+    } else
+      null
   }
 
 }

@@ -1,11 +1,16 @@
 package com.lucendar.common.serv.cleanup;
 
+import info.gratour.common.types.validate.ValidateResultReceiver;
+import org.springframework.scheduling.support.CronExpression;
+
+import java.util.function.Consumer;
+
 public class QuotaCleanupConfig implements CleanupConfig {
 
     private boolean enabled;
     private String cron;
-    private long quotaInM;
-    private long deleteInM;
+    private long quotaM;
+    private long deleteM;
     private Long avgItemSize;
 
     public QuotaCleanupConfig() {
@@ -14,8 +19,8 @@ public class QuotaCleanupConfig implements CleanupConfig {
     public QuotaCleanupConfig(boolean enabled, String cron, long quotaInM, long deleteInM, Long avgItemSize) {
         this.enabled = enabled;
         this.cron = cron;
-        this.quotaInM = quotaInM;
-        this.deleteInM = deleteInM;
+        this.quotaM = quotaInM;
+        this.deleteM = deleteInM;
         this.avgItemSize = avgItemSize;
     }
 
@@ -37,28 +42,28 @@ public class QuotaCleanupConfig implements CleanupConfig {
         this.cron = cron;
     }
 
-    public long getQuotaInM() {
-        return quotaInM;
+    public long getQuotaM() {
+        return quotaM;
     }
 
-    public void setQuotaInM(long quotaInM) {
-        this.quotaInM = quotaInM;
+    public void setQuotaM(long quotaM) {
+        this.quotaM = quotaM;
     }
 
     public long quota() {
-        return quotaInM * 1024 * 1024;
+        return quotaM * 1024 * 1024;
     }
 
-    public long getDeleteInM() {
-        return deleteInM;
+    public long getDeleteM() {
+        return deleteM;
     }
 
-    public void setDeleteInM(long deleteInM) {
-        this.deleteInM = deleteInM;
+    public void setDeleteM(long deleteM) {
+        this.deleteM = deleteM;
     }
 
     public long deleteBatchSize() {
-        return deleteInM * 1024 * 1024;
+        return deleteM * 1024 * 1024;
     }
 
     /**
@@ -74,13 +79,29 @@ public class QuotaCleanupConfig implements CleanupConfig {
         this.avgItemSize = avgItemSize;
     }
 
+    public void validate(ValidateResultReceiver receiver) {
+        if (enabled) {
+            if (cron == null || cron.isEmpty() || !CronExpression.isValidExpression(cron))
+                receiver.invalidField("cron");
+
+            if (quotaM <= 0)
+                receiver.invalidField("quotaM");
+
+            if (deleteM <= 0)
+                receiver.invalidField("deleteM");
+
+            if (avgItemSize < 0)
+                receiver.invalidField("avgItemSize");
+        }
+    }
+
     @Override
     public String toString() {
         return "QuotaCleanupConfig{" +
                 "enabled=" + enabled +
                 ", cron='" + cron + '\'' +
-                ", quotaInM=" + quotaInM +
-                ", deleteInM=" + deleteInM +
+                ", quotaM=" + quotaM +
+                ", deleteM=" + deleteM +
                 ", avgItemSize=" + avgItemSize +
                 '}';
     }
