@@ -10,9 +10,7 @@ package com.lucendar.common.serv.cleanup;
 import info.gratour.common.types.validate.ValidateResultReceiver;
 import org.springframework.scheduling.support.CronExpression;
 
-import java.util.function.Consumer;
-
-public class PeriodicalCleanupConfig implements CleanupConfig {
+public class PeriodicalCleanupConfig implements CleanupConfig, Cloneable {
 
     public static int KEEP_ONE_MONTH = 32;
     public static int KEEP_HALF_YEAR = 183;
@@ -86,5 +84,14 @@ public class PeriodicalCleanupConfig implements CleanupConfig {
                 ", keepDays=" + keepDays +
                 ", keepMinutes=" + keepMinutes +
                 '}';
+    }
+
+    @Override
+    public PeriodicalCleanupConfig clone() {
+        try {
+            return (PeriodicalCleanupConfig) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
     }
 }

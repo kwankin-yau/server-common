@@ -6,7 +6,7 @@ plugins {
 }
 
 group 'com.lucendar.common'
-version '1.0.1'
+version '1.0.3'
 
 compileJava.options.encoding = 'UTF-8'
 compileScala.options.encoding = 'UTF-8'
@@ -22,19 +22,21 @@ dependencies {
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
 
     api 'org.scala-lang:scala-library:2.13.6'
-    implementation('com.typesafe.scala-logging:scala-logging_2.13:3.9.2')
+    implementation('com.typesafe.scala-logging:scala-logging_2.13:3.9.4')
     api 'javax.servlet:javax.servlet-api:4.0.1'
-    api 'org.springframework:spring-web:5.3.9'
-    api 'org.springframework:spring-webmvc:5.3.9'
-    implementation('org.springframework:spring-jdbc:5.3.9') // for DuplicateKeyException
-    api 'org.springframework:spring-context:5.3.9'
-    api ('org.springframework.security:spring-security-core:5.5.2')
+    api 'org.springframework:spring-web:5.3.14'
+    api 'org.springframework:spring-webmvc:5.3.14'
+    implementation('org.springframework:spring-jdbc:5.3.14') // for DuplicateKeyException
+    api 'org.springframework:spring-context:5.3.14'
+    api ('org.springframework.security:spring-security-core:5.5.4')
+//    api ('org.springframework.security:spring-security-core:5.5.2')
 //    api ('org.springframework.security:spring-security-web:5.5.2')
 
     implementation('com.google.guava:guava:30.1-jre') // Throwables
     implementation('commons-codec:commons-codec:1.15')
 
-    api 'info.gratour.common:gratour-common:3.2.2'
+    api 'info.gratour.common:gratour-common:3.2.4'
+    api 'io.netty:netty-buffer:4.1.+'
 }
 
 test {

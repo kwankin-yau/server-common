@@ -7,6 +7,7 @@
  * ***************************************************************************** */
 package com.lucendar.common.serv.servlet
 
+import org.springframework.http.ResponseEntity.HeadersBuilder
 import org.springframework.http.{HttpHeaders, HttpMethod}
 import org.springframework.web.servlet.config.annotation.CorsRegistry
 
@@ -18,6 +19,13 @@ import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 object ServletHelper {
 
   val HEADER_X_AUTH_TOKEN = "X-Auth-Token"
+
+  def addCorsHeaders(headerBuilder: HeadersBuilder[_]): Unit = {
+    headerBuilder.header(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, "*")
+    headerBuilder.header(HttpHeaders.ACCESS_CONTROL_ALLOW_HEADERS, "*")
+    headerBuilder.header(HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS, "GET,POST,DELETE,PUT,OPTIONS")
+    headerBuilder.header(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, "*")
+  }
 
   def addCorsHeaders(request: HttpServletRequest, response: HttpServletResponse): Unit = {
     val origin = request.getHeader(HttpHeaders.ORIGIN)
