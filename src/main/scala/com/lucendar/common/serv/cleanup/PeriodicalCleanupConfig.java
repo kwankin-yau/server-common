@@ -10,23 +10,30 @@ package com.lucendar.common.serv.cleanup;
 import info.gratour.common.types.validate.ValidateResultReceiver;
 import org.springframework.scheduling.support.CronExpression;
 
+import java.util.StringJoiner;
+
 public class PeriodicalCleanupConfig implements CleanupConfig, Cloneable {
 
-    public static int KEEP_ONE_MONTH = 32;
-    public static int KEEP_HALF_YEAR = 183;
+    public static int KEEP_DAYS_ONE_MONTH = 32;
+    public static int KEEP_DAYS_HALF_YEAR = 183;
+
+    public static int KEEP_MINUTES_ONE_MONTH = 32 * 24 * 60;
+    public static int KEEP_MINUTES_HALF_YEAR = 183 * 24 * 60;
+
 
     private boolean enabled;
     private String cron;
-    private int keepDays;
-    private long keepMinutes = 2880; // only for debug
+    private Integer keepDays;
+    private Integer keepMinutes; // only for debug
 
     public PeriodicalCleanupConfig() {
     }
 
-    public PeriodicalCleanupConfig(boolean enabled, String cron, long keepDataDurationMinutes) {
+    public PeriodicalCleanupConfig(boolean enabled, String cron, Integer keepDays, Integer keepMinutes) {
         this.enabled = enabled;
         this.cron = cron;
-        this.keepMinutes = keepDataDurationMinutes;
+        this.keepDays = keepDays;
+        this.keepMinutes = keepMinutes;
     }
 
     @Override
@@ -47,20 +54,29 @@ public class PeriodicalCleanupConfig implements CleanupConfig, Cloneable {
         this.cron = cron;
     }
 
-    public int getKeepDays() {
+    public Integer getKeepDays() {
         return keepDays;
     }
 
-    public void setKeepDays(int keepDays) {
+    public void setKeepDays(Integer keepDays) {
         this.keepDays = keepDays;
     }
 
-    public long getKeepMinutes() {
+    public Integer getKeepMinutes() {
         return keepMinutes;
     }
 
-    public void setKeepMinutes(long keepMinutes) {
+    public void setKeepMinutes(Integer keepMinutes) {
         this.keepMinutes = keepMinutes;
+    }
+
+    public int keepMinutesDef(int defaultValue) {
+        if (keepMinutes != null) {
+            return keepMinutes;
+        } else if (keepDays != null)
+            return keepDays * 24 * 60;
+        else
+            return defaultValue;
     }
 
     public void validate(ValidateResultReceiver receiver) {
@@ -68,22 +84,22 @@ public class PeriodicalCleanupConfig implements CleanupConfig, Cloneable {
             if (cron == null || cron.isEmpty() || !CronExpression.isValidExpression(cron))
                 receiver.invalidField("cron");
 
-            if (keepDays < 0)
+            if (keepDays != null && keepDays < 0)
                 receiver.invalidField("keepDays");
 
-            if (keepDays == 0 && keepMinutes < 0)
-                receiver.invalidField("keepDays");
+            if (keepMinutes != null && keepMinutes < 0)
+                receiver.invalidField("keepMinutes");
         }
     }
 
     @Override
     public String toString() {
-        return "PeriodicalCleanupConfig{" +
-                "enabled=" + enabled +
-                ", cron='" + cron + '\'' +
-                ", keepDays=" + keepDays +
-                ", keepMinutes=" + keepMinutes +
-                '}';
+        return new StringJoiner(", ", PeriodicalCleanupConfig.class.getSimpleName() + "[", "]")
+                .add("enabled=" + enabled)
+                .add("cron='" + cron + "'")
+                .add("keepDays=" + keepDays)
+                .add("keepMinutes=" + keepMinutes)
+                .toString();
     }
 
     @Override

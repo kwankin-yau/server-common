@@ -3,6 +3,8 @@ package com.lucendar.common.serv.cleanup;
 import info.gratour.common.types.validate.ValidateResultReceiver;
 import org.springframework.scheduling.support.CronExpression;
 
+import java.util.StringJoiner;
+
 public class QuotaCleanupConfig implements CleanupConfig, Cloneable {
 
     private boolean enabled;
@@ -95,13 +97,13 @@ public class QuotaCleanupConfig implements CleanupConfig, Cloneable {
 
     @Override
     public String toString() {
-        return "QuotaCleanupConfig{" +
-                "enabled=" + enabled +
-                ", cron='" + cron + '\'' +
-                ", quotaM=" + quotaM +
-                ", deleteM=" + deleteM +
-                ", avgItemSize=" + avgItemSize +
-                '}';
+        return new StringJoiner(", ", QuotaCleanupConfig.class.getSimpleName() + "[", "]")
+                .add("enabled=" + enabled)
+                .add("cron='" + cron + "'")
+                .add("quotaM=" + quotaM)
+                .add("deleteM=" + deleteM)
+                .add("avgItemSize=" + avgItemSize)
+                .toString();
     }
 
     @Override

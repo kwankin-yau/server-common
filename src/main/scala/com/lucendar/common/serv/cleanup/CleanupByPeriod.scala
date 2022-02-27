@@ -9,9 +9,11 @@ import scala.reflect.ClassTag
 trait CleanupByPeriod[ITEM] {
 
   def logger: Logger
+
   def name: String
 
   val config: PeriodicalCleanupConfig
+  val defaultKeepMinutes: Int
 
   /**
    * Query earliest records which timestamp is before given `timestamp`.
@@ -33,13 +35,9 @@ trait CleanupByPeriod[ITEM] {
 
     var time = OffsetDateTime.now()
 
-    if (config.getKeepDays > 0) {
-      time = time.minusDays(config.getKeepDays)
-      logger.debug(s"[${name}] Delete records before time: " + time + s", keep data in days: ${config.getKeepDays}")
-    } else {
-      time = time.minusMinutes(config.getKeepMinutes)
-      logger.debug(s"[${name}] Delete records before time: " + time + s", keep data in minutes: ${config.getKeepMinutes}")
-    }
+    val minutes = config.keepMinutesDef(defaultKeepMinutes)
+    time = time.minusMinutes(minutes)
+    logger.debug(s"[${name}] Delete records before time: " + time + s", keep data in minutes: ${minutes}")
 
     val timeBefore = time.toInstant.toEpochMilli
 
