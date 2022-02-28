@@ -18,7 +18,7 @@ import java.lang.reflect.Type
 import java.nio.charset.StandardCharsets
 import scala.util.Using
 
-class ConfigLoader(resourceLoader: ResourceLoader, activeProfile: String) {
+class ConfigLoader(val resourceLoader: ResourceLoader, val activeProfile: String) {
 
   import ConfigLoader.logger
 
