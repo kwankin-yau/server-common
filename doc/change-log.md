@@ -1,6 +1,7 @@
 # 1.0.3 - [2022-01-03]
 ## Improvement
 - Introduce `com.lucendar.common.serv.utils.ByteBufHelper`
+- Introduce `com.lucendar.common.serv.utils.ConfigLoader`
 
 ## Changed
 - Dependencies:
