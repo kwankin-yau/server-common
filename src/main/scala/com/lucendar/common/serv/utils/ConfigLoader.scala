@@ -10,6 +10,7 @@ package com.lucendar.common.serv.utils
 import com.google.gson.{JsonObject, JsonParser}
 import com.typesafe.scalalogging.Logger
 import info.gratour.common.Consts
+import info.gratour.common.error.{ErrorWithCode, Errors}
 import info.gratour.common.utils.JsonUtils
 import org.apache.commons.io.IOUtils
 import org.springframework.core.io.ResourceLoader
@@ -36,7 +37,7 @@ class ConfigLoader(val resourceLoader: ResourceLoader, val activeProfile: String
     }
   }
 
-  def loadText[T >: Null](baseName: String, fileExt: String, convert: String => T): Option[T] = {
+  def loadTextOpt[T >: Null](baseName: String, fileExt: String, convert: String => T): Option[T] = {
     val primaryConfig =
       if (activeProfile != null && activeProfile.nonEmpty) {
         s"$baseName-$activeProfile.$fileExt"
@@ -52,7 +53,25 @@ class ConfigLoader(val resourceLoader: ResourceLoader, val activeProfile: String
       Some(convert(s))
   }
 
-  def loadJson[T >: Null](baseName: String, typ: Type): Option[T] = {
+  private def notFoundException(baseName: String, fileExt: String): ErrorWithCode = {
+    val message =
+      if (activeProfile != null)
+        s"Configuration file: `$baseName.$fileExt` does not found under profile: $activeProfile."
+      else
+        s"Configuration file: `$baseName.$fileExt` does not found."
+
+    new ErrorWithCode(Errors.INVALID_CONFIG, message)
+  }
+
+  def loadText[T >: Null](baseName: String, fileExt: String, convert: String => T): T = {
+    val r = loadTextOpt(baseName, fileExt, convert)
+    if (r.isEmpty)
+      throw notFoundException(baseName, fileExt)
+
+    r.get
+  }
+
+  def loadJsonOpt[T >: Null](baseName: String, typ: Type): Option[T] = {
     val (primaryConfig, overrideConfig) =
       if (activeProfile != null && activeProfile.nonEmpty) {
         (s"$baseName-$activeProfile.json", s"$baseName-override-$activeProfile.json")
@@ -76,6 +95,14 @@ class ConfigLoader(val resourceLoader: ResourceLoader, val activeProfile: String
       logger.info(s"`${overrideConfig}` NOT found, ignored.")
 
     Some(Consts.GSON.fromJson(json, typ))
+  }
+
+  def loadJson[T >: Null](baseName: String, typ: Type): T = {
+    val r = loadJsonOpt(baseName, typ)
+    if (r.isEmpty)
+      throw notFoundException(baseName, "json")
+
+    r.get
   }
 
 }
