@@ -10,6 +10,10 @@ trait CleanupByPeriod[ITEM] {
 
   def logger: Logger
 
+  /**
+   * Return name of the cleaner, used for debug purpose.
+   * @return name of the cleaner.
+   */
   def name: String
 
   val config: PeriodicalCleanupConfig

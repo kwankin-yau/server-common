@@ -27,6 +27,33 @@ object ServletHelper {
     headerBuilder.header(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, "*")
   }
 
+  def addCorsHeaders(request: HttpServletRequest, headerBuilder: HeadersBuilder[_]): Unit = {
+    val origin = request.getHeader(HttpHeaders.ORIGIN)
+    headerBuilder.header(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, origin)
+
+    val requestHeaders = request.getHeader(HttpHeaders.ACCESS_CONTROL_REQUEST_HEADERS)
+    if (requestHeaders != null)
+      headerBuilder.header(HttpHeaders.ACCESS_CONTROL_ALLOW_HEADERS, requestHeaders)
+    else
+      headerBuilder.header(HttpHeaders.ACCESS_CONTROL_ALLOW_HEADERS, "*")
+
+    val requestMethod = request.getHeader(HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD)
+    if (requestMethod != null)
+      headerBuilder.header(HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS, requestMethod)
+    else
+      headerBuilder.header(HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS, "GET,POST,DELETE,PUT,OPTIONS")
+
+    val expose = request.getHeader(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS)
+    if (expose != null)
+      headerBuilder.header(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, "*")
+    else
+      headerBuilder.header(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, "*")
+
+//    headerBuilder.header(HttpHeaders.VARY, "Origin")
+
+    headerBuilder.header("Access-Control-Max-Age", "3600")
+  }
+
   def addCorsHeaders(request: HttpServletRequest, response: HttpServletResponse): Unit = {
     val origin = request.getHeader(HttpHeaders.ORIGIN)
     if (!response.containsHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN))

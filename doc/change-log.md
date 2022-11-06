@@ -1,3 +1,7 @@
+# 1.0.4 - [2022-08-03]
+## Improvement
+- Introduce ServletHelper.addCorsHeaders(HttpServletRequest, HeadersBuilder[_])
+
 # 1.0.3 - [2022-01-03]
 ## Improvement
 - Introduce `com.lucendar.common.serv.utils.ByteBufHelper`
