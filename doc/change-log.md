@@ -1,3 +1,9 @@
+# 1.0.5 - [2022-12-11]
+## Changed
+- Dependencies:
+  - Bump `scala-library` from `2.13.6` to `2.13.10`
+  - Bump `gratour-common` from `3.2.4` to `3.2.7`
+
 # 1.0.4 - [2022-08-03]
 ## Improvement
 - Introduce ServletHelper.addCorsHeaders(HttpServletRequest, HeadersBuilder[_])

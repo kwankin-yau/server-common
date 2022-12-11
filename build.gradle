@@ -6,7 +6,7 @@ plugins {
 }
 
 group 'com.lucendar.common'
-version '1.0.4'
+version '1.0.5'
 
 compileJava.options.encoding = 'UTF-8'
 compileScala.options.encoding = 'UTF-8'
@@ -21,7 +21,7 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
 
-    api 'org.scala-lang:scala-library:2.13.6'
+    api 'org.scala-lang:scala-library:2.13.10'
     implementation('com.typesafe.scala-logging:scala-logging_2.13:3.9.4')
     api 'javax.servlet:javax.servlet-api:4.0.1'
     api 'org.springframework:spring-web:5.3.15'
@@ -35,7 +35,7 @@ dependencies {
     implementation('com.google.guava:guava:30.1-jre') // Throwables
     implementation('commons-codec:commons-codec:1.15')
 
-    api 'info.gratour.common:gratour-common:3.2.4'
+    api 'info.gratour.common:gratour-common:3.2.7'
     api 'io.netty:netty-all:4.1.73.Final'
 }
 
