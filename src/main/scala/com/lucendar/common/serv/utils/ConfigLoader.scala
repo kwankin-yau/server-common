@@ -12,9 +12,10 @@ import com.typesafe.scalalogging.Logger
 import info.gratour.common.Consts
 import info.gratour.common.error.{ErrorWithCode, Errors}
 import info.gratour.common.utils.JsonUtils
-import org.apache.commons.io.IOUtils
-import org.springframework.core.io.ResourceLoader
+import org.apache.commons.io.{FilenameUtils, IOUtils}
+import org.springframework.core.io.{Resource, ResourceLoader}
 
+import java.io.File
 import java.lang.reflect.Type
 import java.nio.charset.StandardCharsets
 import scala.util.Using
@@ -23,18 +24,41 @@ class ConfigLoader(val resourceLoader: ResourceLoader, val activeProfile: String
 
   import ConfigLoader.logger
 
+  private val springConfigLocation: String = {
+    var location = System.getProperty("spring.config.location")
+    if (location != null) {
+      val f = new File(location)
+      if (!f.exists() || !f.isDirectory)
+        location = null
+    }
+
+    location
+  }
+
+  private def loadStringFromRes(res: Resource): String = {
+    Using.resource(res.getInputStream) { in =>
+      IOUtils.toString(in, StandardCharsets.UTF_8)
+    }
+  }
+
 
   private def loadStringFromRes(fileName: String, resourceLoader: ResourceLoader): String = {
-    var res = resourceLoader.getResource("file:config/" + fileName)
+    var res: Resource = null
+    if (springConfigLocation != null) {
+      val fn = FilenameUtils.concat(springConfigLocation, fileName)
+      res = resourceLoader.getResource("file:" + fn)
+      if (res.exists())
+        return loadStringFromRes(res)
+    }
+
+    res = resourceLoader.getResource("file:config/" + fileName)
     if (!res.exists()) {
       res = resourceLoader.getResource("classpath:" + fileName)
       if (!res.exists())
         return null
     }
 
-    Using.resource(res.getInputStream) { in =>
-      IOUtils.toString(in, StandardCharsets.UTF_8)
-    }
+    loadStringFromRes(res)
   }
 
   def loadTextOpt[T >: Null](baseName: String, fileExt: String, convert: String => T): Option[T] = {

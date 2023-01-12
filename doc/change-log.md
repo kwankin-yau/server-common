@@ -1,3 +1,7 @@
+# 1.0.6 - [2023-01-12]
+## Improvement
+- `ConfigLoader` now check system property `spring.config.location` for override config directory.
+
 # 1.0.5 - [2022-12-11]
 ## Changed
 - Dependencies:
