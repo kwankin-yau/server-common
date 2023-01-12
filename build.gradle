@@ -1,7 +1,6 @@
 plugins {
     id 'java-library'
     id 'scala'
-    id 'maven'
     id 'maven-publish'
 }
 
