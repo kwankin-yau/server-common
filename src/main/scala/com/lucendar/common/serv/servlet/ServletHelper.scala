@@ -11,7 +11,7 @@ import org.springframework.http.ResponseEntity.HeadersBuilder
 import org.springframework.http.{HttpHeaders, HttpMethod}
 import org.springframework.web.servlet.config.annotation.CorsRegistry
 
-import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
+import jakarta.servlet.http.{HttpServletRequest, HttpServletResponse}
 
 /**
  * @since 1.0.1

@@ -9,8 +9,8 @@ package com.lucendar.common.serv.servlet
 
 import org.springframework.http.HttpHeaders
 
-import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
-import javax.servlet.{Filter, FilterChain, ServletRequest, ServletResponse}
+import jakarta.servlet.http.{HttpServletRequest, HttpServletResponse}
+import jakarta.servlet.{Filter, FilterChain, ServletRequest, ServletResponse}
 
 class DefaultCorsFilter extends Filter {
   override def doFilter(req: ServletRequest, res: ServletResponse, chain: FilterChain): Unit = {

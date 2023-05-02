@@ -1,3 +1,9 @@
+# 1.1.0 - [2023-05-02]
+## Changed
+- Dependencies:
+  - require a minimum of JDK 17 at runtime
+  - as well as a minimum of Tomcat 10 / Jetty 11 (for Jakarta EE 9 compatibility)
+
 # 1.0.6 - [2023-01-12]
 ## Improvement
 - `ConfigLoader` now check system property `spring.config.location` for override config directory.
