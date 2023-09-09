@@ -1,3 +1,8 @@
+# 2.0.0 - [2023-09-07]
+## Changed
+- Introduce `lucendar-common`
+- Bump `gratour-common` to 3.3.0
+
 # 1.1.0 - [2023-05-02]
 ## Changed
 - Dependencies:

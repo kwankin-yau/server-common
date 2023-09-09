@@ -5,7 +5,7 @@ plugins {
 }
 
 group 'com.lucendar.common'
-version '1.1.0'
+version '2.0.0-SNAPSHOT'
 
 compileJava.options.encoding = 'UTF-8'
 compileScala.options.encoding = 'UTF-8'
@@ -38,7 +38,8 @@ dependencies {
     implementation('com.google.guava:guava:30.1-jre') // Throwables
     implementation('commons-codec:commons-codec:1.15')
 
-    api 'info.gratour.common:gratour-common:3.2.8'
+    api ('com.lucendar.common:lucendar-common:1.0.0-SNAPSHOT')
+    api 'info.gratour.common:gratour-common:3.3.0-SNAPSHOT'
     api 'io.netty:netty-all:4.1.91.Final'
 }
 
@@ -53,8 +54,25 @@ task sourceJar(type: Jar) {
 }
 
 publishing {
+    repositories {
+        maven {
+            if (project.version.toString().endsWith("-SNAPSHOT")) {
+                name = "snapshotsRepo"
+                url = "https://wx.gratour.info:7999/repository/maven-snapshots/"
+            } else {
+                name = "releasesRepo"
+                url = "https://wx.gratour.info:7999/repository/my-nexus/"
+            }
+
+            credentials {
+                username = "${ossUser}"
+                password = "${ossPwd}"
+            }
+        }
+    }
+
     publications {
-        myPublic(MavenPublication) {
+        maven(MavenPublication) {
             from components.java
             artifact sourceJar
         }

@@ -11,12 +11,12 @@ package com.lucendar.common.serv.servlet
 import com.google.common.base.Throwables
 import com.typesafe.scalalogging.Logger
 import info.gratour.common.error.{ErrorWithCode, Errors}
-import info.gratour.common.types.rest.RawReply
+import info.gratour.common.types.rest.Reply
 import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.dao.DuplicateKeyException
 import org.springframework.web.HttpRequestMethodNotSupportedException
 import org.springframework.web.bind.MissingServletRequestParameterException
-import org.springframework.web.bind.annotation.{ExceptionHandler, RestControllerAdvice}
+import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.context.request.async.AsyncRequestTimeoutException
 
 import java.sql.SQLException
@@ -46,9 +46,9 @@ trait ExceptionAdvisor {
     else
       ""
 
-  protected def errorReply(errCode: Int, e: Throwable): RawReply = {
+  protected def errorReply(errCode: Int, e: Throwable): Reply[Void] = {
     val msg = Errors.errorMessage(errCode, LocaleContextHolder.getLocale) + rootMessage(e)
-    new RawReply(errCode, msg)
+    Reply.error(errCode, msg)
   }
 
   /**
@@ -59,7 +59,7 @@ trait ExceptionAdvisor {
    */
   protected def sqlExceptionStateToErrorCode(state: String): Option[Int]
 
-  protected def handleSqlException(ex: SQLException): RawReply = {
+  protected def handleSqlException(ex: SQLException): Reply[Void] = {
     val state = ex.getSQLState
 
     if (state != null) {
@@ -101,12 +101,12 @@ trait ExceptionAdvisor {
   }
 
   @ExceptionHandler(Array(classOf[Throwable]))
-  def handle(e: Throwable): RawReply = {
+  def handle(e: Throwable): Reply[Void] = {
     log(e)
 
     e match {
       case ec: ErrorWithCode =>
-        return new RawReply(ec.getErrCode, ec.getMessage)
+        return Reply.error(ec.getErrCode, ec.getMessage)
 
       case _: TimeoutException =>
         return errorReply(Errors.TIMEOUT, e)
