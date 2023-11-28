@@ -179,7 +179,7 @@ object NetUtils {
 
       val portStr = s.substring(idx + 1)
       val port = StringUtils.tryParseInt(portStr)
-      if (!isValidPortNum(port))
+      if (port == null || !isValidPortNum(port))
         return null
 
       val hostStr = s.substring(0, idx)
@@ -197,9 +197,15 @@ object NetUtils {
       "Basic " + Base64.getEncoder.encodeToString(bytes)
     }
 
-    def calcBasicAuthorization(username: String, password: String): String = calcBasicAuthorization(username, password, StandardCharsets.US_ASCII)
+    def calcBasicAuthorization(username: String, password: String): String =
+      calcBasicAuthorization(username, password, StandardCharsets.US_ASCII)
 
-    def calcDigestAuthorization(username: String, password: String, realm: String, nonce: String, httpMethod: String, digestUri: String): String = {
+    def calcDigestAuthorization(username: String,
+                                password: String,
+                                realm: String,
+                                nonce: String,
+                                httpMethod: String,
+                                digestUri: String): String = {
       // HA1 = MD5(username:realm:password)
       // HA2 = MD5(httpMethod:digestURI)
       // response = MD5(HA1:nonce:HA2)
@@ -228,6 +234,9 @@ object NetUtils {
       def asBasic: BasicHttpAuthorization = {
         if (!isBasic)
           throw ErrorWithCode.internalError("Non Basic authorization")
+
+        if (params == null || params.isEmpty)
+          throw ErrorWithCode.invalidParam("authorization");
 
         val s = params(0)
         val concatenation = new String(Base64.getDecoder.decode(s), StandardCharsets.US_ASCII)
