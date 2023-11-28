@@ -7,11 +7,10 @@
  * ***************************************************************************** */
 package com.lucendar.common.serv.utils
 
-import com.google.gson.{JsonObject, JsonParser}
+import com.google.gson.{Gson, JsonObject, JsonParser}
+import com.lucendar.common.utils.JsonUtils
 import com.typesafe.scalalogging.Logger
-import info.gratour.common.Consts
 import info.gratour.common.error.{ErrorWithCode, Errors}
-import info.gratour.common.utils.JsonUtils
 import org.apache.commons.io.{FilenameUtils, IOUtils}
 import org.springframework.core.io.{Resource, ResourceLoader}
 
@@ -95,7 +94,7 @@ class ConfigLoader(val resourceLoader: ResourceLoader, val activeProfile: String
     r.get
   }
 
-  def loadJsonOpt[T >: Null](baseName: String, typ: Type): Option[T] = {
+  def loadJsonOpt[T >: Null](gson: Gson, baseName: String, typ: Type): Option[T] = {
     val (primaryConfig, overrideConfig) =
       if (activeProfile != null && activeProfile.nonEmpty) {
         (s"$baseName-$activeProfile.json", s"$baseName-override-$activeProfile.json")
@@ -118,11 +117,11 @@ class ConfigLoader(val resourceLoader: ResourceLoader, val activeProfile: String
     } else
       logger.info(s"`${overrideConfig}` NOT found, ignored.")
 
-    Some(Consts.GSON.fromJson(json, typ))
+    Some(gson.fromJson(json, typ))
   }
 
-  def loadJson[T >: Null](baseName: String, typ: Type): T = {
-    val r = loadJsonOpt(baseName, typ)
+  def loadJson[T >: Null](gson: Gson, baseName: String, typ: Type): T = {
+    val r = loadJsonOpt(gson, baseName, typ)
     if (r.isEmpty)
       throw notFoundException(baseName, "json")
 

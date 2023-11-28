@@ -1,6 +1,6 @@
 package com.lucendar.common.serv.cleanup;
 
-import info.gratour.common.types.validate.ValidateResultReceiver;
+import com.lucendar.common.types.ValidateResultReceiver;
 import org.springframework.scheduling.support.CronExpression;
 
 import java.util.StringJoiner;
