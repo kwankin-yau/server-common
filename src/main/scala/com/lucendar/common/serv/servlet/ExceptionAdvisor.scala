@@ -9,6 +9,7 @@ package com.lucendar.common.serv.servlet
 
 
 import com.google.common.base.Throwables
+import com.lucendar.common.serv.utils.ServUtils
 import com.typesafe.scalalogging.Logger
 import info.gratour.common.error.{ErrorWithCode, Errors}
 import info.gratour.common.types.rest.Reply
@@ -22,32 +23,15 @@ import org.springframework.web.context.request.async.AsyncRequestTimeoutExceptio
 import java.sql.SQLException
 import java.util.concurrent.TimeoutException
 
-//@RestControllerAdvice
-trait ExceptionAdvisor {
+abstract class ExceptionAdvisor {
 
   import ExceptionAdvisor.logger
 
   protected def log(e: Throwable): Unit =
     logger.error(String.format("Exception occurred: [%s]%s.", e.getClass.getName, e.getMessage), e)
 
-  protected def message(t: Throwable): String =
-    if (t != null) {
-      val m = t.getMessage
-      if (m != null)
-        m
-      else
-        ""
-    } else
-      ""
-
-  protected def rootMessage(t: Throwable): String =
-    if (t != null)
-      message(Throwables.getRootCause(t))
-    else
-      ""
-
   protected def errorReply(errCode: Int, e: Throwable): Reply[Void] = {
-    val msg = Errors.errorMessage(errCode, LocaleContextHolder.getLocale) + rootMessage(e)
+    val msg = Errors.errorMessage(errCode, LocaleContextHolder.getLocale) + " " + ServUtils.rootMessageOf(e)
     Reply.error(errCode, msg)
   }
 
@@ -80,22 +64,6 @@ trait ExceptionAdvisor {
           else
             errorReply(Errors.INTERNAL_ERROR, ex)
       }
-//      state match {
-//        case "23503" | "U0002" =>
-//          errorReply(Errors.FOREIGN_KEY_VIOLATION, ex)
-//
-//        case "23505" =>
-//          errorReply(Errors.DUPLICATED_VALUE, ex)
-//
-//        case "U0001" =>
-//          errorReply(Errors.NOT_ENOUGH_PRIV, ex)
-//
-//        case "U0003" =>
-//          errorReply(Errors.RECORD_NOT_FOUND, ex)
-//
-//        case _ =>
-//          errorReply(Errors.INTERNAL_ERROR, ex)
-//      }
     } else
       errorReply(Errors.INTERNAL_ERROR, ex)
   }
@@ -140,4 +108,7 @@ trait ExceptionAdvisor {
 
 object ExceptionAdvisor {
   private val logger = Logger[ExceptionAdvisor]
+
+
+
 }

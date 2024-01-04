@@ -4,8 +4,8 @@ plugins {
     id 'maven-publish'
 }
 
-group 'com.lucendar.common'
-version '2.0.0-SNAPSHOT'
+group 'com.lucendar'
+version '3.0.0-SNAPSHOT'
 
 compileJava.options.encoding = 'UTF-8'
 compileScala.options.encoding = 'UTF-8'
@@ -40,7 +40,7 @@ dependencies {
     implementation('com.google.guava:guava:30.1-jre') // Throwables
     implementation('commons-codec:commons-codec:1.15')
 
-    api ('com.lucendar.common:lucendar-common:1.0.0-SNAPSHOT')
+    api ('com.lucendar:lucendar-common:2.0.0-SNAPSHOT')
     api 'io.netty:netty-all:4.1.91.Final'
 }
 

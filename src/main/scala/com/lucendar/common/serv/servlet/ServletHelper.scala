@@ -7,10 +7,11 @@
  * ***************************************************************************** */
 package com.lucendar.common.serv.servlet
 
+import com.google.gson.Gson
+import info.gratour.common.types.rest.Reply
 import org.springframework.http.ResponseEntity.HeadersBuilder
 import org.springframework.http.{HttpHeaders, HttpMethod}
 import org.springframework.web.servlet.config.annotation.CorsRegistry
-
 import jakarta.servlet.http.{HttpServletRequest, HttpServletResponse}
 
 /**
@@ -52,6 +53,7 @@ object ServletHelper {
 //    headerBuilder.header(HttpHeaders.VARY, "Origin")
 
     headerBuilder.header("Access-Control-Max-Age", "3600")
+    headerBuilder.header(HttpHeaders.ACCESS_CONTROL_ALLOW_CREDENTIALS, "true");
   }
 
   def addCorsHeaders(request: HttpServletRequest, response: HttpServletResponse): Unit = {
@@ -81,6 +83,9 @@ object ServletHelper {
 
     if (!response.containsHeader(HttpHeaders.ACCESS_CONTROL_MAX_AGE))
       response.setHeader("Access-Control-Max-Age", "3600")
+
+    if (!response.containsHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_CREDENTIALS))
+      response.setHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_CREDENTIALS, "true");
   }
 
   def addCorsMappings(registry: CorsRegistry): Unit = {
@@ -140,6 +145,25 @@ private String getClientIpAddress(HttpServletRequest request) {
       }
     } else
       null
+  }
+
+  def setErrorResp(req: HttpServletRequest, resp: HttpServletResponse, stataCode: Int, json: String): Unit = {
+    resp.setStatus(stataCode)
+    val bytes = json.getBytes
+    resp.setContentLength(bytes.length)
+    resp.getOutputStream.write(bytes)
+    resp.setContentType("application/json")
+
+    ServletHelper.addCorsHeaders(req, resp)
+  }
+
+  def setErrorResp(req: HttpServletRequest,
+                   resp: HttpServletResponse,
+                   stataCode: Int,
+                   reply: Reply[_],
+                   gson: Gson): Unit = {
+    val json = gson.toJson(reply)
+    setErrorResp(req, resp, stataCode, json)
   }
 
 }

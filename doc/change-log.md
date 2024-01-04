@@ -1,3 +1,18 @@
+# 3.0.0 - [2023-11-28]
+## Improvement
+- Introduce NetUtils2 which retains dns function original exists in NetUtils
+- Introduce `com.lucendar.common.serv.servlet.ServletHelper.setErrorResp`
+- Introduce `com.lucendar.common.serv.utils.ServUtils.mapMimeTypeFromFileName`
+- Introduce `com.lucendar.common.serv.utils.ServUtils.errCodeToHttpStatusCode`
+
+## Changed
+- Maven group changed `com.lucendar`
+- Move the following classes to lucendar-common.
+  - NetUtils (some class moved to NetUtils2)
+
+- Dependencies:
+  - Bump `lucendar-common` to 2.0.0
+
 # 2.0.0 - [2023-09-07]
 ## Changed
 - Introduce `lucendar-common`
