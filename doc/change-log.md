@@ -4,6 +4,7 @@
 - Introduce `com.lucendar.common.serv.servlet.ServletHelper.setErrorResp`
 - Introduce `com.lucendar.common.serv.utils.ServUtils.mapMimeTypeFromFileName`
 - Introduce `com.lucendar.common.serv.utils.ServUtils.errCodeToHttpStatusCode`
+- Introduce `com.lucendar.common.serv.utils.NettyEnv`
 
 ## Changed
 - Maven group changed `com.lucendar`

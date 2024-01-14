@@ -2,17 +2,20 @@ plugins {
     id 'java-library'
     id 'scala'
     id 'maven-publish'
+    id 'signing'
 }
 
 group 'com.lucendar'
-version '3.0.0-SNAPSHOT'
+version '3.0.0'
 
 compileJava.options.encoding = 'UTF-8'
 compileScala.options.encoding = 'UTF-8'
 
+sourceCompatibility = 17
+targetCompatibility = 17
+
 
 repositories {
-    mavenLocal()
     mavenCentral()
 }
 
@@ -39,42 +42,65 @@ dependencies {
     implementation('com.google.guava:guava:30.1-jre') // Throwables
     implementation('commons-codec:commons-codec:1.15')
 
-    api ('com.lucendar:lucendar-common:2.0.0-SNAPSHOT')
-    api 'io.netty:netty-all:4.1.91.Final'
+    api ('com.lucendar:lucendar-common:2.0.0')
+    api 'io.netty:netty-all:4.1.104.Final'
 }
 
 test {
     useJUnitPlatform()
 }
 
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
 
-task sourceJar(type: Jar) {
-    from sourceSets.main.allSource
-    archiveClassifier = "sources"
+javadoc {
+    options.encoding = 'UTF-8'
+
+    if (JavaVersion.current().isJava9Compatible()) {
+        options.addBooleanOption('html5', true)
+    }
 }
 
 publishing {
-    repositories {
-        maven {
-            if (project.version.toString().endsWith("-SNAPSHOT")) {
-                name = "snapshotsRepo"
-                url = "${snapshotUrl}"
-            } else {
-                name = "releasesRepo"
-                url = "${releaseUrl}"
-            }
-
-            credentials {
-                username = "${ossUser}"
-                password = "${ossPwd}"
-            }
-        }
-    }
-
     publications {
         maven(MavenPublication) {
             from components.java
-            artifact sourceJar
+
+            pom {
+                name = 'server-common'
+                packaging = 'jar'
+                // optionally artifactId can be defined here
+                description = 'Server side common library.'
+                url = 'https://github.com/kwankin-yau/server-common'
+
+                scm {
+                    connection = 'https://github.com/kwankin-yau/server-common.git'
+                    developerConnection = 'https://github.com/kwankin-yau/server-common.git'
+                    url = 'https://github.com/kwankin-yau/server-common'
+                }
+
+                licenses {
+                    license {
+                        name = 'MIT'
+                        url = 'http://opensource.org/licenses/MIT'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id = 'kky'
+                        name = 'kwankin-yau'
+                        email = 'alphax@vip.163.com'
+                    }
+                }
+            }
         }
     }
 }
+
+signing {
+    sign publishing.publications.maven
+}
+
