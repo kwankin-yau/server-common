@@ -5,12 +5,12 @@
 ```xml
 <dependency>
     <groupId>com.lucendar</groupId>
-    <artifactId>db-common</artifactId>
-    <version>2.0.0</version>
+    <artifactId>server-common</artifactId>
+    <version>3.0.0</version>
 </dependency>
 ```
 
 ## Gradle
 ```groovy
-implementation 'com.lucendar:db-common:2.0.0'
+implementation 'com.lucendar:server-common:3.0.0'
 ```
