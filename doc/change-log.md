@@ -1,3 +1,7 @@
+# 3.1.0 - [2024-01-21]
+## Improvement
+- Make `NettyEnv` implement the `AutoCloseable` interface.
+
 # 3.0.0 - [2023-11-28]
 ## Improvement
 - Introduce NetUtils2 which retains dns function original exists in NetUtils

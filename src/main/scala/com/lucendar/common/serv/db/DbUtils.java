@@ -1,5 +1,8 @@
 package com.lucendar.common.serv.db;
 
+/**
+ * Database(JDBC) utility class.
+ */
 public class DbUtils {
 
     public static final String SQL_DIALECT__POSTGRESQL = "postgresql";
@@ -10,8 +13,9 @@ public class DbUtils {
     public static final String SQL_DIALECT__H2 = "h2";
 
     /**
+     * Parse SqlDialect from given JDBC url.
      *
-     * @param jdbcUrl
+     * @param jdbcUrl the JDBC url
      * @return the sql dialect, null if parse failed
      */
     public static String parseSqlDialectFromJdbcUrl(String jdbcUrl) {

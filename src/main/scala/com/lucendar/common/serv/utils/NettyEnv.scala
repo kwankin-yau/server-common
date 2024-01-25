@@ -12,4 +12,9 @@ import io.netty.channel.nio.NioEventLoopGroup
  * @param bossGroup
  * @param workerGroup
  */
-case class NettyEnv(bossGroup: NioEventLoopGroup, workerGroup: NioEventLoopGroup)
+case class NettyEnv(bossGroup: NioEventLoopGroup, workerGroup: NioEventLoopGroup) extends AutoCloseable {
+  override def close(): Unit = {
+    bossGroup.shutdownGracefully()
+    workerGroup.shutdownGracefully()
+  }
+}
