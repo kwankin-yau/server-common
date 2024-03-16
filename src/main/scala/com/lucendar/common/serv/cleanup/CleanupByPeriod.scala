@@ -6,6 +6,11 @@ import com.typesafe.scalalogging.Logger
 import java.time.OffsetDateTime
 import scala.reflect.ClassTag
 
+/**
+ * 周期性数据库清理接口
+ *
+ * @tparam ITEM 清理时，返回的用于打印或调试的信息对象
+ */
 trait CleanupByPeriod[ITEM] {
 
   def logger: Logger

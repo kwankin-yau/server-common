@@ -8,8 +8,10 @@
 package com.lucendar.common.serv.cleanup;
 
 import com.lucendar.common.types.ValidateResultReceiver;
+import info.gratour.common.error.ErrorWithCode;
 import org.springframework.scheduling.support.CronExpression;
 
+import java.time.Instant;
 import java.util.StringJoiner;
 
 public class PeriodicalCleanupConfig implements CleanupConfig, Cloneable {
@@ -77,6 +79,23 @@ public class PeriodicalCleanupConfig implements CleanupConfig, Cloneable {
             return keepDays * 24 * 60;
         else
             return defaultValue;
+    }
+
+    public long keepSecondsDef(long defaultValue) {
+        if (keepMinutes != null) {
+            return keepMinutes * 60;
+        } else if (keepDays != null)
+            return keepDays * 24 * 60 * 60;
+        else
+            return defaultValue;
+    }
+
+    public long earliestKeepTimeFromNow() {
+        if (keepMinutes == null || keepDays == null)
+            throw ErrorWithCode.invalidConfig("keepDays");
+
+        long seconds = keepSecondsDef(0L);
+        return Instant.now().minusSeconds(seconds).toEpochMilli();
     }
 
     public void validate(ValidateResultReceiver receiver) {

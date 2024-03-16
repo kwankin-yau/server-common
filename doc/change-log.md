@@ -1,6 +1,10 @@
 # 3.1.0 - [2024-01-21]
 ## Improvement
-- Make `NettyEnv` implement the `AutoCloseable` interface.
+- 令 `NettyEnv` 实现 `AutoCloseable` 接口
+- 新增 `com.lucendar.common.serv.cleanup.DbCleaner` 接口
+- 新增 `com.lucendar.common.serv.cleanup.DbCleanupReq`
+- `PeriodicalCleanupConfig` 新增 `earliestKeepTimeFromNow` 方法
+- `SslConfig` 增加 PEM 证书支持
 
 # 3.0.0 - [2023-11-28]
 ## Improvement
