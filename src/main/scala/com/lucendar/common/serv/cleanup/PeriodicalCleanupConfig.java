@@ -16,11 +16,13 @@ import java.util.StringJoiner;
 
 public class PeriodicalCleanupConfig implements CleanupConfig, Cloneable {
 
-    public static int KEEP_DAYS_ONE_MONTH = 32;
-    public static int KEEP_DAYS_HALF_YEAR = 183;
+    public static int KEEP_DAYS_ONE_WEEK = 8; // 7 + 1
+    public static int KEEP_DAYS_ONE_MONTH = 32; // 31 + 1
+    public static int KEEP_DAYS_HALF_YEAR = 183; // 183
 
-    public static int KEEP_MINUTES_ONE_MONTH = 32 * 24 * 60;
-    public static int KEEP_MINUTES_HALF_YEAR = 183 * 24 * 60;
+    public static int KEEP_MINUTES_ONE_WEEK = KEEP_DAYS_ONE_WEEK * 24 * 60;
+    public static int KEEP_MINUTES_ONE_MONTH = KEEP_DAYS_ONE_MONTH * 24 * 60;
+    public static int KEEP_MINUTES_HALF_YEAR = KEEP_DAYS_HALF_YEAR * 24 * 60;
 
 
     private boolean enabled;
