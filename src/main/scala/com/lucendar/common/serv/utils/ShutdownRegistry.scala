@@ -58,14 +58,9 @@ object ShutdownRegistry {
     }
 
     if (shutdownExecuted.compareAndSet(false, true)) {
-
       this.synchronized {
-        logger.debug("Starting shutdown() processing, registry: ")
-        list.forEach(e => {
-          logger.debug("  " + e.name)
-        })
-
         list.forEach { e =>
+          logger.debug("Shutdown() processing: close " + e.name)
           e.close()
         }
       }

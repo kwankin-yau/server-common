@@ -20,9 +20,9 @@ import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 
 /**
- * Spring boot style SSL config
+ * Spring boot style SSL config. Only support JKS and PEM format.
  */
-public interface SslConfig {
+public interface SslConfigIntf {
 
     String getKeyStoreType();
 
@@ -51,13 +51,12 @@ public interface SslConfig {
         }
     }
 
-
     /**
      * Build netty SslContext, return null if SSL is disabled.
      * @return netty SslContext
      */
     @Nullable
-    default SslContext buildServerSslContext() {
+    default SslContext buildNettyServerSslContext() {
         if (isEnabled()) {
             try {
                 String certificate = getCertificate();

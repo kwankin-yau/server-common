@@ -18,6 +18,14 @@ public class DbCleanupReq<T, C extends CleanupConfig> {
     private final DataSource ds;
     private final C config;
     private final T req;
+
+    /**
+     * 构造函数
+     *
+     * @param ds 数据源
+     * @param config 数据清理配置
+     * @param req 数据清理请求
+     */
     public DbCleanupReq(DataSource ds, C config, T req) {
         this.ds = ds;
         this.config = config;
