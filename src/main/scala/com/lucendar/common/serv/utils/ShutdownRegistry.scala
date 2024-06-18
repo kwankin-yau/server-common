@@ -51,7 +51,8 @@ object ShutdownRegistry {
 
   def shutdown(): Unit = {
     if (startup.get()) {
-      logger.debug("shutdown() called in startup processing, delay it.", new Throwable)
+      logger.debug("shutdown() called in startup processing, delay it.",
+        new Throwable("shutdown() called in startup processing, this exception is used for print the call stack."))
       delayedShutdown.set(true)
       return
     }
