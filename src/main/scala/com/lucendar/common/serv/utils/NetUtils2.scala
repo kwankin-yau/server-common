@@ -20,7 +20,12 @@ object NetUtils2 {
   private final val resolverMap = new ConcurrentHashMap[String, SimpleResolver]()
 
   def shutdownDnsSelector(): Unit = {
-    org.xbill.DNS.NioClient.close()
+    try {
+      org.xbill.DNS.NioClient.close()
+    } catch {
+      case t: NullPointerException =>
+        // suppress the null pointer exception when the NioClient.selector is null
+    }
   }
 
 
