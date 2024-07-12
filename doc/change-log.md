@@ -5,6 +5,7 @@
 - 新增 `com.lucendar.common.serv.cleanup.DbCleanupReq`
 - `PeriodicalCleanupConfig` 新增 `earliestKeepTimeFromNow` 方法
 - `SslConfig` 增加 PEM 证书支持
+- 新增 `com.lucendar.common.serv.utils.SslUtils`
 
 # 3.0.0 - [2023-11-28]
 ## Improvement
