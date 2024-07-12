@@ -93,7 +93,7 @@ public class PeriodicalCleanupConfig implements CleanupConfig, Cloneable {
     }
 
     public long earliestKeepTimeFromNow() {
-        if (keepMinutes == null || keepDays == null)
+        if (keepMinutes == null && keepDays == null)
             throw ErrorWithCode.invalidConfig("keepDays");
 
         long seconds = keepSecondsDef(0L);
